@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>みんなのお誕生日</title>
 <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&display=swap" rel="stylesheet">
 
@@ -15,6 +15,9 @@
   --bg-color:#fffaf0;
   --text-color:#7d5a50;
 }
+
+*{ box-sizing: border-box; }
+
 body{
   margin:0;
   font-family:'Kiwi Maru',serif;
@@ -22,181 +25,165 @@ body{
   display:flex;
   flex-direction:column;
   align-items:center;
-  padding:20px;
-  gap:14px;
-  color:var(--text-color);
-}
-h1{color:var(--sub-pink);margin:0;}
-
-.controls,.btn-area{
-  display:flex;
+  padding:10px 5px;
   gap:10px;
-  flex-wrap:wrap;
-  justify-content:center;
+  color:var(--text-color);
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-.ctrl-btn{
-  padding:10px 16px;
-  font-weight:bold;
-  border-radius:16px;
-  border:2px solid #ffecb3;
-  background:white;
-  box-shadow:0 4px 0 #ffecb3;
-  cursor:pointer;
-}
-.ctrl-btn:active{
-  transform:translateY(3px);
-  box-shadow:0 1px 0 #ffecb3;
-}
-.reset-btn{
-  background:#ff8a80;
-  color:white;
-  border-color:#ff5252;
-  box-shadow:0 4px 0 #ff5252;
-}
-
-.table-container{
-  background:white;
-  padding:16px;
-  border-radius:30px;
-  border:6px solid #ffecb3;
-
-  width:min(95%, 1100px);
-}
-
-table{
-  border-collapse:separate;
-  border-spacing:4px;
-  table-layout:fixed;   /* 🔥 列幅均等 */
-  width:100%;           /* 🔥 画面幅に合わせる */
-}
-
-th{
-  aspect-ratio:1/1;     /* 🔥 常に正方形 */
-  text-align:center;
-  vertical-align:middle;
-  border-radius:10px;
-  cursor:pointer;
-  font-size:clamp(10px, 1.2vw, 14px);
-  white-space:nowrap;
-}
-
-th.active-header{
-  background:var(--main-pink);
-  color:white;
-}
-
-td{
-  aspect-ratio:1/1;     /* 🔥 常に正方形 */
-  text-align:center;
-  vertical-align:middle;
-  border-radius:10px;
-}
-
-.cell{
-  border:2px solid #ffe4ec;
-  cursor:pointer;
-  background:white;
-  font-weight:bold;
-}
-
-.cell.none{
-  background:#f5f5f5;
-  border:none;
-  pointer-events:none;
-  opacity:0.5;
-}
-
-.highlight-row{
-  background:var(--highlight-bg)!important;
-}
-
-.highlight-col{
-  background:var(--highlight-bg)!important;
-}
-
-.cross-point{
-  box-shadow:0 0 0 3px var(--highlight-border);
-}
-
-.color-1{background:#e1f5fe!important;}
-.color-2{background:#f1f8e9!important;}
-.color-3{background:#fff9c4!important;}
-.color-4{background:#ffe0b2!important;}
-.color-5{background:#f8bbd0!important;}
-
-.main-btn{
-  padding:16px 30px;
-  border-radius:50px;
-  border:none;
-  font-weight:bold;
-  cursor:pointer;
-  color:white;
-}
-.btn-no-dup{background:var(--sub-pink);}
-.btn-allow-dup{background:#b2e2d2;color:#5d4037;}
-
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.3);
-  display:none;
-  justify-content:center;
-  align-items:center;
-}
-.modal{
-  background:white;
-  padding:40px;
-  border-radius:30px;
-  border:6px solid #ffecb3;
-  text-align:center;
-}
-.modal-buttons{
-  margin-top:20px;
-  display:flex;
-  gap:15px;
-  justify-content:center;
-}
-
-.credit{
-  position:fixed;
-  right:20px;
-  bottom:10px;
-  font-size:13px;
-  opacity:0.8;
-}
-.credit a{
+h1{
   color:var(--sub-pink);
-  text-decoration:none;
-}
-.credit a:hover{text-decoration:underline;}
-
-#toast{
-  position:fixed;
-  bottom:40px;
-  left:50%;
-  transform:translateX(-50%);
-  background:linear-gradient(to right,#ff8fb1,#ffb7c5);
-  color:white;
-  padding:14px 28px;
-  border-radius:30px;
-  font-size:1.1rem;
-  display:none;
-  pointer-events:none;
-  animation:fade 1.6s ease forwards;
-  box-shadow:0 8px 20px rgba(0,0,0,0.15);
+  margin:5px 0;
+  font-size: clamp(1.1rem, 5vw, 1.8rem);
 }
 
-@keyframes fade{
-  0%{opacity:0;transform:translate(-50%,20px);}
-  20%{opacity:1;transform:translate(-50%,0);}
-  80%{opacity:1;}
-  100%{opacity:0;transform:translate(-50%,-20px);}
+.controls, .btn-area {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
 }
 
-.cell-text.zero{
-  color:transparent !important;
+.ctrl-btn {
+  padding: 8px 10px;
+  font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+  font-weight: bold;
+  border-radius: 12px;
+  border: 2px solid #ffecb3;
+  background: white;
+  box-shadow: 0 3px 0 #ffecb3;
+  cursor: pointer;
 }
+.ctrl-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #ffecb3;
+}
+.reset-btn {
+  background: #ff8a80;
+  color: white;
+  border-color: #ff5252;
+  box-shadow: 0 3px 0 #ff5252;
+}
+
+.table-container {
+  background: white;
+  padding: 10px 2px;
+  border-radius: 15px;
+  border: clamp(2px, 1vw, 5px) solid #ffecb3;
+  width: 100%; 
+  max-width: 1000px;
+  display: block;
+}
+
+table {
+  display: grid;
+  grid-template-columns: 1.2fr repeat(31, 1fr); 
+  gap: 0; 
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead, tbody, tr {
+  display: contents;
+}
+
+th, td {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1; 
+  width: 100%;
+  min-width: 0;
+  border-radius: 4px;
+  font-size: min(2vw, 13px); 
+  cursor: pointer;
+  user-select: none;
+  border: 0.1px solid transparent;
+}
+
+th { font-weight: bold; background: transparent; }
+th.active-header { background: var(--main-pink); color: white; }
+
+.cell {
+  border: 0.5px solid #ffe4ec;
+  background: white;
+  font-weight: bold;
+}
+
+.cell.none {
+  background: #f1f1f1;
+  border: none;
+  pointer-events: none;
+  opacity: 0.2;
+}
+
+.highlight-row { background: var(--highlight-bg) !important; }
+.highlight-col { background: var(--highlight-bg) !important; }
+.cross-point { 
+  box-shadow: 0 0 0 1px var(--highlight-border) inset;
+  background: white !important;
+}
+
+.color-1 { background: #e1f5fe !important; }
+.color-2 { background: #f1f8e9 !important; }
+.color-3 { background: #fff9c4 !important; }
+.color-4 { background: #ffe0b2 !important; }
+.color-5 { background: #f8bbd0 !important; }
+
+.main-btn {
+  padding: 12px 24px;
+  border-radius: 50px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  color: white;
+  font-size: clamp(0.8rem, 4vw, 1rem);
+}
+.btn-no-dup { background: var(--sub-pink); }
+.btn-allow-dup { background: #b2e2d2; color: #5d4037; }
+
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  display: none; justify-content: center; align-items: center; z-index: 1000;
+}
+.modal {
+  background: white; padding: 20px; border-radius: 20px;
+  border: 4px solid #ffecb3; text-align: center; max-width: 90%;
+}
+.modal-buttons {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* トーストのアニメーションを1.5秒に調整 */
+#toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(to right,#ff8fb1,#ffb7c5);
+  color: white; padding: 12px 24px; border-radius: 30px;
+  display: none; z-index: 2000; font-size: 1rem;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  animation: fade 1.5s ease forwards;
+}
+
+@keyframes fade {
+  0% { opacity: 0; transform: translate(-50%, 20px); }
+  15% { opacity: 1; transform: translate(-50%, 0); }
+  85% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+/* 4. クレジットのサイズをアップ */
+.credit { 
+  margin-top: 15px; 
+  font-size: clamp(12px, 3vw, 15px); 
+  opacity: 0.8; 
+  padding-bottom: 20px;
+}
+.credit a { color: var(--sub-pink); text-decoration: none; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -206,7 +193,7 @@ td{
 <div class="controls">
   <button id="undo-btn" class="ctrl-btn">← もどす</button>
   <button id="redo-btn" class="ctrl-btn">すすむ →</button>
-  <button id="reset-btn" class="ctrl-btn reset-btn">ぜんぶ消す！</button>
+  <button id="reset-btn" class="ctrl-btn reset-btn">ぜんぶ消す</button>
 </div>
 
 <div class="table-container">
@@ -225,10 +212,10 @@ td{
   </div>
 </div>
 
+<div id="toast"></div>
+
 <div class="credit">
-  <a href="https://x.com/momochou_md?s=20" target="_blank">
-    for @momochou_md
-  </a>
+  <a href="https://x.com/momochou_md?s=20" target="_blank">for @momochou_md</a>
 </div>
 
 <script>
@@ -251,16 +238,16 @@ function buildEmpty(){
 
 function render(){
   const table=document.getElementById("calendar-table");
-  let html="<tr><th></th>";
+  let html="<thead><tr><th></th>";
   for(let d=0;d<31;d++){
     let cls=(activeDay===d)?"active-header":"";
     html+=`<th class="${cls}" data-col="${d}">${d+1}</th>`;
   }
-  html+="</tr>";
+  html+="</tr></thead><tbody>";
 
   for(let m=0;m<12;m++){
     let rcls=(activeMonth===m)?"active-header":"";
-    html+=`<tr><th class="${rcls}" data-row="${m}">${m+1}月</th>`;
+    html+=`<tr><th class="${rcls}" data-row="${m}">${m+1}</th>`;
     for(let d=0;d<31;d++){
       let val=counts[m][d];
       if(val===-1) html+="<td class='cell none'></td>";
@@ -270,21 +257,17 @@ function render(){
         if(activeMonth===m) cls+=" highlight-row";
         if(activeDay===d) cls+=" highlight-col";
         if(activeMonth===m&&activeDay===d) cls+=" cross-point";
-html+=`<td class="${cls}" data-m="${m}" data-d="${d}">
-<span class="cell-text ${!val ? 'zero' : ''}">
-  ${val || 0}
-</span>
-</td>`;
+        html+=`<td class="${cls}" data-m="${m}" data-d="${d}">${val||""}</td>`;
       }
     }
     html+="</tr>";
   }
+  html+="</tbody>";
   table.innerHTML=html;
 
   table.querySelectorAll("[data-m]").forEach(cell=>{
     cell.onclick=()=>{
-      undoStack.push(JSON.stringify(counts));
-      redoStack=[];
+      saveUndo();
       counts[cell.dataset.m][cell.dataset.d]++;
       render();
     };
@@ -305,6 +288,11 @@ html+=`<td class="${cls}" data-m="${m}" data-d="${d}">
   });
 
   checkComplete();
+}
+
+function saveUndo(){
+  undoStack.push(JSON.stringify(counts));
+  redoStack=[];
 }
 
 function checkComplete(){
@@ -340,12 +328,16 @@ function showModal(message,buttons){
 function closeModal(){
   document.getElementById("modal").style.display="none";
 }
+
+// 3. トーストの文言と表示時間を修正
 function showToast(m,d){
   const toast=document.getElementById("toast");
   toast.innerText=(m+1)+"月"+(d+1)+"日がえらばれたよ！";
-  toast.style.display="none";
-  void toast.offsetWidth; // 再アニメーション用
   toast.style.display="block";
+  // 1.5秒後に消去
+  setTimeout(()=> {
+    toast.style.display="none";
+  }, 1500);
 }
 
 function initButtons(){
@@ -361,44 +353,45 @@ function initButtons(){
     counts=JSON.parse(redoStack.pop());
     render();
   };
+
+  // 1. クリア後の警告ポップアップを追加
   document.getElementById("btn-no-dup").onclick=()=>{
-    
-    // 🔥 クリア後は使用不可
-if(completedShown){
-  showModal("クリア後には使えないよ！",[
-    {text:"とじる",class:"ctrl-btn",action:closeModal}
-  ]);
-  return;
-}
-    
+    if(completedShown){
+      showModal("クリアした後は使えないよ！", [
+        {text:"とじる",class:"ctrl-btn",action:closeModal}
+      ]);
+      return;
+    }
     let targets=[];
     for(let m=0;m<12;m++)
       for(let d=0;d<31;d++)
         if(counts[m][d]===0) targets.push({m,d});
     if(!targets.length) return;
     let t=targets[Math.floor(Math.random()*targets.length)];
-    undoStack.push(JSON.stringify(counts));
+    saveUndo();
     counts[t.m][t.d]++;
     render();
-showToast(t.m,t.d);
+    showToast(t.m,t.d);
   };
+
   document.getElementById("btn-allow-dup").onclick=()=>{
     let all=[];
     for(let m=0;m<12;m++)
       for(let d=0;d<31;d++)
         if(counts[m][d]!==-1) all.push({m,d});
     let t=all[Math.floor(Math.random()*all.length)];
-    undoStack.push(JSON.stringify(counts));
+    saveUndo();
     counts[t.m][t.d]++;
     render();
-showToast(t.m,t.d);
+    showToast(t.m,t.d);
   };
+
+  // 2. リセット時の文言を変更
   document.getElementById("reset-btn").onclick=()=>{
-    showModal("ぜんぶ消しちゃう？",[
+    showModal("ぜんぶ消しちゃうの？<br>もどすボタンで戻せるよ！",[
       {text:"やめる",class:"ctrl-btn",action:closeModal},
       {text:"消しちゃう！",class:"ctrl-btn reset-btn",action:()=>{
-        undoStack.push(JSON.stringify(counts));
-        redoStack=[];
+        saveUndo();
         buildEmpty();
         render();
         closeModal();
@@ -411,8 +404,5 @@ buildEmpty();
 render();
 initButtons();
 </script>
-
-<div id="toast"></div>
 </body>
-
 </html>
