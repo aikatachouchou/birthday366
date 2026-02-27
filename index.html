@@ -60,21 +60,25 @@ h1{color:var(--sub-pink);margin:0;}
   padding:16px;
   border-radius:30px;
   border:6px solid #ffecb3;
+
+  width:min(95%, 1100px);
 }
 
 table{
   border-collapse:separate;
   border-spacing:4px;
+  table-layout:fixed;   /* 🔥 列幅均等 */
+  width:100%;           /* 🔥 画面幅に合わせる */
 }
 
 th{
-  width:38px;              /* ← 固定幅 */
-  height:34px;
+  aspect-ratio:1/1;     /* 🔥 常に正方形 */
   text-align:center;
+  vertical-align:middle;
   border-radius:10px;
   cursor:pointer;
-  font-size:12px;
-  white-space:nowrap;      /* ← 折り返し防止 */
+  font-size:clamp(10px, 1.2vw, 14px);
+  white-space:nowrap;
 }
 
 th.active-header{
@@ -83,9 +87,9 @@ th.active-header{
 }
 
 td{
-  width:34px;
-  height:34px;
+  aspect-ratio:1/1;     /* 🔥 常に正方形 */
   text-align:center;
+  vertical-align:middle;
   border-radius:10px;
 }
 
@@ -189,6 +193,10 @@ td{
   80%{opacity:1;}
   100%{opacity:0;transform:translate(-50%,-20px);}
 }
+
+.cell-text.zero{
+  color:transparent !important;
+}
 </style>
 </head>
 <body>
@@ -262,7 +270,11 @@ function render(){
         if(activeMonth===m) cls+=" highlight-row";
         if(activeDay===d) cls+=" highlight-col";
         if(activeMonth===m&&activeDay===d) cls+=" cross-point";
-        html+=`<td class="${cls}" data-m="${m}" data-d="${d}">${val||""}</td>`;
+html+=`<td class="${cls}" data-m="${m}" data-d="${d}">
+<span class="cell-text ${!val ? 'zero' : ''}">
+  ${val || 0}
+</span>
+</td>`;
       }
     }
     html+="</tr>";
