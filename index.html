@@ -159,13 +159,18 @@ th.active-header { background: var(--main-pink); color: white; }
   justify-content: center;
 }
 
-/* トーストのアニメーションを1.5秒に調整 */
+/* 1. トーストのCSS修正：改行を禁止 */
 #toast {
-  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%);
   background: linear-gradient(to right,#ff8fb1,#ffb7c5);
   color: white; padding: 12px 24px; border-radius: 30px;
   display: none; z-index: 2000; font-size: 1rem;
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  white-space: nowrap; /* 強制改行を防止 */
+}
+
+/* トースト用アニメーション */
+.toast-anim {
   animation: fade 1.5s ease forwards;
 }
 
@@ -176,7 +181,6 @@ th.active-header { background: var(--main-pink); color: white; }
   100% { opacity: 0; transform: translate(-50%, -20px); }
 }
 
-/* 4. クレジットのサイズをアップ */
 .credit { 
   margin-top: 15px; 
   font-size: clamp(12px, 3vw, 15px); 
@@ -224,6 +228,7 @@ let counts=[],undoStack=[],redoStack=[];
 let completedShown=false;
 let activeMonth=null;
 let activeDay=null;
+let toastTimer = null; // 連打制御用
 
 function buildEmpty(){
   counts=[];
@@ -329,15 +334,26 @@ function closeModal(){
   document.getElementById("modal").style.display="none";
 }
 
-// 3. トーストの文言と表示時間を修正
+// 2. 連打対応版トースト関数
 function showToast(m,d){
   const toast=document.getElementById("toast");
-  toast.innerText=(m+1)+"月"+(d+1)+"日がえらばれたよ！";
-  toast.style.display="block";
-  // 1.5秒後に消去
-  setTimeout(()=> {
-    toast.style.display="none";
-  }, 1500);
+  
+  // 以前のタイマーとアニメーションをリセット
+  clearTimeout(toastTimer);
+  toast.style.display = "none";
+  toast.classList.remove("toast-anim");
+  
+  // ブラウザの再描画を待ってから新しく表示（連打時でもアニメーションが最初から再生される）
+  setTimeout(() => {
+    toast.innerText=(m+1)+"月"+(d+1)+"日がえらばれたよ！";
+    toast.style.display="block";
+    toast.classList.add("toast-anim");
+    
+    toastTimer = setTimeout(()=> {
+      toast.style.display="none";
+      toast.classList.remove("toast-anim");
+    }, 1500);
+  }, 10);
 }
 
 function initButtons(){
@@ -354,7 +370,6 @@ function initButtons(){
     render();
   };
 
-  // 1. クリア後の警告ポップアップを追加
   document.getElementById("btn-no-dup").onclick=()=>{
     if(completedShown){
       showModal("クリアした後は使えないよ！", [
@@ -386,7 +401,6 @@ function initButtons(){
     showToast(t.m,t.d);
   };
 
-  // 2. リセット時の文言を変更
   document.getElementById("reset-btn").onclick=()=>{
     showModal("ぜんぶ消しちゃうの？<br>もどすボタンで戻せるよ！",[
       {text:"やめる",class:"ctrl-btn",action:closeModal},
