@@ -350,6 +350,15 @@ function initButtons(){
     render();
   };
   document.getElementById("btn-no-dup").onclick=()=>{
+    
+    // 🔥 クリア後は使用不可
+if(completedShown){
+  showModal("クリア後には使えないよ！",[
+    {text:"とじる",class:"ctrl-btn",action:closeModal}
+  ]);
+  return;
+}
+    
     let targets=[];
     for(let m=0;m<12;m++)
       for(let d=0;d<31;d++)
@@ -393,4 +402,5 @@ initButtons();
 
 <div id="toast"></div>
 </body>
+
 </html>
