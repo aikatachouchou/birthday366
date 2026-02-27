@@ -2,589 +2,160 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<!--
-  [修正2] user-scalable=no / maximum-scale=1.0 を削除
-  → ユーザーが指でピンチズーム・パンできるようになる
-  → overflow:auto スクロールコンテナ不要になりiOSリペイントバグも解消
--->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>みんなのお誕生日</title>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="お誕生日">
-<meta name="theme-color" content="#ffb7c5">
-<link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&display=swap" rel="stylesheet">
+
 <style>
-  :root {
-    --main-pink: #ffb7c5;
-    --sub-pink: #ff8fb1;
-    --highlight-bg: #fff5f7;
-    --highlight-border: #ffcada;
-    --bg-color: #fffaf0;
-    --text-color: #7d5a50;
-    --mint-green: #b2e2d2;
-    --safe-top:    env(safe-area-inset-top,    0px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
-    --safe-left:   env(safe-area-inset-left,   0px);
-    --safe-right:  env(safe-area-inset-right,  0px);
-  }
+:root{
+  --main-pink:#ffb7c5;
+  --sub-pink:#ff8fb1;
+  --highlight-bg:#fff5f7;
+  --highlight-border:#ffcada;
+  --bg-color:#fffaf0;
+  --text-color:#7d5a50;
+}
 
-  * {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
-  }
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
 
-  html, body {
-    height: 100%;
-    overscroll-behavior: none;
-  }
+body{
+  margin:0;
+  font-family:sans-serif;
+  background:var(--bg-color);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:20px;
+}
 
-  body {
-    font-family: 'Kiwi Maru', serif;
-    background-color: var(--bg-color);
-    background-image: radial-gradient(#ffe4e1 1px, transparent 1px);
-    background-size: 20px 20px;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;       /* [修正1] 全コンテンツを中央寄せ */
-    padding:
-      calc(var(--safe-top)    + 16px)
-      calc(var(--safe-right)  + 12px)
-      calc(var(--safe-bottom) + 30px)
-      calc(var(--safe-left)   + 12px);
-    color: var(--text-color);
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
-    gap: 14px;
-    touch-action: manipulation;
-  }
+h1{
+  color:var(--sub-pink);
+  margin-bottom:20px;
+}
 
-  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     [修正1] ヘッダー
-     ・flex レイアウトで「ボタン群 ／ タイトル ／ 余白」を1行に配置
-     ・ボタン群は flex-shrink:0 + flex-wrap:nowrap で絶対に折り返さない
-     ・タイトルは flex:1 + text-align:center で常に中央
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-  .header {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 12px;
-  }
+.table-container{
+  background:white;
+  padding:16px;
+  border-radius:20px;
+  border:6px solid #ffecb3;
+}
 
-  /* ボタン側の幅と同じダミーで右側のバランスを取りタイトルを真ん中に */
-  .header-spacer {
-    flex: 0 0 auto;
-    visibility: hidden;   /* 見えないが幅は確保 */
-    display: flex;
-    gap: 8px;
-    pointer-events: none;
-  }
-  /* スペーサー内の幅はcontrolsと同じボタン構成で自動一致させる */
-  .header-spacer .ctrl-btn { pointer-events: none; }
+table{
+  border-collapse:separate;
+  border-spacing:4px;
+}
 
-  h1 {
-    flex: 1;               /* 余った幅をすべて使う */
-    color: var(--sub-pink);
-    font-size: clamp(1.4rem, 3.5vw, 3rem);
-    margin: 0;
-    text-shadow: 3px 3px 0 white, -1px -1px 0 white;
-    letter-spacing: 2px;
-    text-align: center;    /* 必ず中央 */
-    white-space: nowrap;
-  }
+th{
+  width:34px;height:34px;
+  font-size:12px;
+  border-radius:8px;
+  cursor:pointer;
+}
 
-  .controls {
-    flex: 0 0 auto;
-    display: flex;
-    gap: 8px;
-    flex-wrap: nowrap;     /* [修正1] 絶対に折り返さない */
-    align-items: center;
-  }
+.cell{
+  width:34px;height:34px;
+  border-radius:8px;
+  text-align:center;
+  cursor:pointer;
+  background:white;
+  border:2px solid #eee;
+}
 
-  /* スマホ：縦積みに変更 */
-  @media (max-width: 600px) {
-    .header {
-      flex-direction: column;
-      align-items: center;
-    }
-    .header-spacer { display: none; }
-    h1 { font-size: clamp(1.4rem, 6vw, 2.2rem); }
-    .controls { justify-content: center; }
-  }
+.cell.none{
+  background:#f5f5f5;
+  pointer-events:none;
+}
 
-  /* ━━━ ボタン ━━━ */
-  .ctrl-btn {
-    padding: 10px 14px;
-    font-size: 13px;
-    font-weight: bold;
-    border: 2px solid #ffecb3;
-    border-radius: 15px;
-    cursor: pointer;
-    background-color: white;
-    box-shadow: 0 4px 0 #ffecb3;
-    font-family: inherit;
-    color: var(--text-color);
-    transition: all 0.1s;
-    touch-action: manipulation;
-    -webkit-user-select: none;
-    min-height: 44px;
-    white-space: nowrap;
-  }
-  .ctrl-btn:active  { transform: translateY(3px); box-shadow: 0 1px 0 #ffecb3; }
-  .ctrl-btn:hover   { opacity: 0.85; }
-  .ctrl-btn:disabled { opacity: 0.3; pointer-events: none; }
-  .ctrl-btn.reset-btn {
-    background-color: #ff8a80;
-    color: white;
-    border-color: #ff5252;
-    box-shadow: 0 4px 0 #ff5252;
-  }
-  .ctrl-btn.holding {
-    background-color: #fff0f0;
-    transform: translateY(2px);
-    box-shadow: 0 1px 0 #ffecb3;
-  }
-
-  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     [修正2] テーブル
-     ・overflow:auto スクロールラッパーを廃止
-       → iOS Safariのリペイント遅延バグの根本原因を除去
-     ・テーブルは固定サイズで描画
-     ・はみ出し分はユーザーのピンチズーム＋パンで閲覧
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-  .table-container {
-    background: white;
-    padding: 16px;
-    border-radius: 35px;
-    border: 8px solid #ffecb3;
-    box-shadow: 0 15px 30px rgba(255, 183, 197, 0.2);
-    /* インラインブロックで内容にぴったり合わせる */
-    display: inline-block;
-    /* スクロールコンテナにしない → リペイントバグ回避 */
-  }
-
-  table { border-collapse: separate; border-spacing: 4px; }
-
-  th {
-    width: 34px; height: 34px;
-    font-size: 12px; font-weight: bold;
-    cursor: pointer;
-    background-color: #fffdf9;
-    border-radius: 10px;
-    transition: background-color 0.15s;
-    border: 2px solid #fff5f7;
-    font-family: inherit;
-    color: var(--text-color);
-    touch-action: manipulation;
-  }
-  th:hover  { background-color: var(--highlight-bg); }
-  th:active { transform: scale(0.9); }
-  th.active-header {
-    background-color: var(--main-pink) !important;
-    color: white !important;
-    border-color: var(--sub-pink);
-  }
-
-  .cell {
-    width: 34px; height: 34px;
-    border-radius: 10px;
-    border: 2px solid #fff5f7;
-    text-align: center;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    font-family: inherit;
-    transition: transform 0.12s;  /* background は即時反映、transformのみ遅延 */
-    background: white;
-    touch-action: manipulation;
-    color: var(--text-color);
-  }
-  .cell:hover  { transform: scale(1.15) rotate(2deg); border-color: var(--main-pink); }
-  .cell:active { transform: scale(0.85) rotate(2deg); }
-
-  .highlight-row { background-color: var(--highlight-bg) !important; }
-  .highlight-col { background-color: var(--highlight-bg) !important; }
-  .cell.cross-point { box-shadow: 0 0 0 3px var(--highlight-border); border-color: var(--sub-pink); }
-  .cell.none { background-color: #f5f5f5; border: none; pointer-events: none; opacity: 0.5; }
-
-  .color-1 { background-color: #e1f5fe !important; }
-  .color-2 { background-color: #f1f8e9 !important; }
-  .color-3 { background-color: #fff9c4 !important; }
-  .color-4 { background-color: #ffe0b2 !important; }
-  .color-5 { background-color: #f8bbd0 !important; border-color: var(--sub-pink) !important; }
-
-  /* ━━━ ランダムボタン ━━━ */
-  .btn-area {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 0 4px;
-  }
-
-  .main-btn {
-    flex: 0 0 auto;
-    padding: 18px 32px;
-    font-size: clamp(1rem, 2.5vw, 1.3rem);
-    font-weight: bold;
-    cursor: pointer;
-    color: white;
-    border: none;
-    border-radius: 60px;
-    font-family: inherit;
-    transition: all 0.2s;
-    touch-action: manipulation;
-    min-height: 56px;
-    white-space: nowrap;
-  }
-  .btn-no-dup    { background-color: var(--sub-pink); box-shadow: 0 8px 0 #e57399; }
-  .btn-allow-dup { background-color: var(--mint-green); color: #5d4037; box-shadow: 0 8px 0 #8cc7b1; }
-  .main-btn:hover  { opacity: 0.9; }
-  .main-btn:active { transform: translateY(6px); box-shadow: 0 2px 0 rgba(0,0,0,0.1); }
-
-  /* ━━━ トースト ━━━ */
-  #toast-notice {
-    position: fixed;
-    bottom: calc(var(--safe-bottom) + 50px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(to right, var(--sub-pink), #ffb7c5);
-    color: white;
-    padding: 15px 35px;
-    border-radius: 30px;
-    font-size: 1.1rem;
-    font-family: inherit;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    display: none;
-    z-index: 5000;
-    white-space: nowrap;
-    animation: bounceIn 1.5s ease forwards;
-  }
-  @keyframes bounceIn {
-    0%   { opacity: 0; transform: translate(-50%, 20px); }
-    20%  { opacity: 1; transform: translate(-50%, 0); }
-    80%  { opacity: 1; transform: translate(-50%, 0); }
-    100% { opacity: 0; transform: translate(-50%, -20px); }
-  }
-
-  /* ━━━ モーダル ━━━ */
-  .overlay {
-    position: fixed; inset: 0;
-    background: rgba(125, 90, 80, 0.3);
-    display: none; align-items: center; justify-content: center;
-    z-index: 6000;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    padding: 20px;
-  }
-  .modal {
-    background: white;
-    padding: 40px 36px;
-    border-radius: 40px;
-    text-align: center;
-    border: 8px solid #ffecb3;
-    max-width: 420px; width: 100%;
-    box-shadow: 0 20px 0 #ffecb3, 0 30px 40px rgba(0,0,0,0.1);
-    animation: modalPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  @keyframes modalPop {
-    0%   { transform: scale(0.7); opacity: 0; }
-    100% { transform: scale(1);   opacity: 1; }
-  }
-  #modal-text {
-    font-size: 1.3rem;
-    font-weight: bold;
-    line-height: 1.7;
-    font-family: inherit;
-    color: var(--text-color);
-  }
-  .modal-btns { display: flex; gap: 16px; justify-content: center; margin-top: 28px; }
-
-  /* ━━━ クレジット ━━━ */
-  .credit {
-    position: fixed;
-    right: calc(var(--safe-right) + 15px);
-    bottom: calc(var(--safe-bottom) + 10px);
-    font-size: 13px;
-    opacity: 0.8;
-    z-index: 1000;
-    font-family: inherit;
-  }
-  .credit a { color: var(--sub-pink); text-decoration: none; }
-  .credit a:hover { text-decoration: underline; }
+.color-1{background:#e1f5fe;}
+.color-2{background:#f1f8e9;}
+.color-3{background:#fff9c4;}
+.color-4{background:#ffe0b2;}
+.color-5{background:#f8bbd0;}
 </style>
 </head>
+
 <body>
 
-  <!--
-    ヘッダー構造：
-    [スペーサー(非表示)] [タイトル(flex:1 中央)] [ボタン群(nowrap)]
-    スペーサーをボタン群と同じ構成にすることでタイトルが視覚的に中央になる
-  -->
-  <div class="header">
-    <div class="header-spacer" aria-hidden="true">
-      <button class="ctrl-btn">← もどす</button>
-      <button class="ctrl-btn">すすむ →</button>
-      <button class="ctrl-btn reset-btn">ぜんぶ消す！</button>
-    </div>
-    <h1>みんなのお誕生日</h1>
-    <div class="controls">
-      <button id="undo-btn" class="ctrl-btn">← もどす</button>
-      <button id="redo-btn" class="ctrl-btn">すすむ →</button>
-      <button id="reset-trigger" class="ctrl-btn reset-btn">ぜんぶ消す！</button>
-    </div>
-  </div>
+<h1>みんなのお誕生日</h1>
 
-  <!--
-    [修正2] table-wrapper（overflow:auto スクロールコンテナ）を廃止
-    テーブルを直接 body に配置。はみ出し部分はピンチズームで閲覧。
-  -->
-  <div class="table-container">
-    <table id="calendar-table"></table>
-  </div>
-
-  <div class="btn-area">
-    <button id="btn-no-dup" class="main-btn btn-no-dup">被らないランダム</button>
-    <button id="btn-allow-dup" class="main-btn btn-allow-dup">被れるランダム</button>
-  </div>
-
-  <div class="credit">
-    <a href="https://x.com/momochou_md?s=20" target="_blank">for @momochou_md</a>
-  </div>
-
-  <div id="toast-notice"></div>
-
-  <div id="modal-overlay" class="overlay">
-    <div class="modal">
-      <p id="modal-text"></p>
-      <div id="modal-btns" class="modal-btns"></div>
-    </div>
-  </div>
+<div class="table-container">
+<table id="calendar-table"></table>
+</div>
 
 <script>
-  var monthDays = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  var counts    = [];
-  var undoStack = [];
-  var redoStack = [];
-  var activeMonth = null;
-  var activeDay   = null;
-  var holdTimer   = null;
+var monthDays=[31,29,31,30,31,30,31,31,30,31,30,31];
+var counts=[];
+var undoStack=[];
+var redoStack=[];
 
-  /* ─── 初期化 ─── */
-  function init() {
-    try {
-      var saved = localStorage.getItem('bday_v_sweet_final');
-      if (saved) { counts = JSON.parse(saved); } else { buildEmpty(); }
-    } catch(e) { buildEmpty(); }
-    render();
-    setupHold('undo-btn', undo);
-    setupHold('redo-btn', redo);
-  }
-
-  function buildEmpty() {
-    counts = [];
-    for (var m = 0; m < 12; m++) {
-      var row = [];
-      for (var d = 0; d < 31; d++) { row.push(d < monthDays[m] ? 0 : -1); }
-      counts.push(row);
+function buildEmpty(){
+  counts=[];
+  for(var m=0;m<12;m++){
+    var row=[];
+    for(var d=0;d<31;d++){
+      row.push(d<monthDays[m]?0:-1);
     }
+    counts.push(row);
   }
+}
 
-  /* ─── 描画 ─── */
-  function render() {
-    var table = document.getElementById('calendar-table');
-    var html = '<tr><th></th>';
-    for (var d = 0; d < 31; d++) {
-      var cls = (activeDay === d) ? 'active-header' : '';
-      html += '<th class="' + cls + '" onclick="toggleCol(' + d + ')">' + (d + 1) + '</th>';
-    }
-    html += '</tr>';
+function init(){
+  buildEmpty();
+  render();
+}
 
-    for (var m = 0; m < 12; m++) {
-      var rCls = (activeMonth === m) ? 'active-header' : '';
-      html += '<tr><th class="' + rCls + '" onclick="toggleRow(' + m + ')">' + (m + 1) + '月</th>';
-      for (var d = 0; d < 31; d++) {
-        var val = counts[m][d];
-        if (val === -1) {
-          html += '<td class="cell none"></td>';
-        } else {
-          var cls = 'cell';
-          if (val > 0) cls += ' color-' + (val > 5 ? 5 : val);
-          if (activeMonth === m) cls += ' highlight-row';
-          if (activeDay   === d) cls += ' highlight-col';
-          if (activeMonth === m && activeDay === d) cls += ' cross-point';
-          html += '<td class="' + cls + '" onclick="cellClick(' + m + ',' + d + ')">'
-                + (val > 0 ? val : '') + '</td>';
-        }
+function render(){
+  var table=document.getElementById("calendar-table");
+  var html="<tr><th></th>";
+
+  for(var d=0;d<31;d++){
+    html+="<th data-col='"+d+"'>"+(d+1)+"</th>";
+  }
+  html+="</tr>";
+
+  for(var m=0;m<12;m++){
+    html+="<tr>";
+    html+="<th data-row='"+m+"'>"+(m+1)+"月</th>";
+    for(var d=0;d<31;d++){
+      var val=counts[m][d];
+      if(val===-1){
+        html+="<td class='cell none'></td>";
+      }else{
+        var cls="cell";
+        if(val>0) cls+=" color-"+(val>5?5:val);
+        html+="<td class='"+cls+"' data-m='"+m+"' data-d='"+d+"'>"+(val>0?val:"")+"</td>";
       }
-      html += '</tr>';
     }
-
-    /*
-      [修正2] innerHTML を直接 table に書き込む
-      overflow:auto コンテナの外なので iOS Safari がリペイントを即時実行する
-      forceRepaint ハックは不要になった
-    */
-    table.innerHTML = html;
-
-    document.getElementById('undo-btn').disabled = (undoStack.length === 0);
-    document.getElementById('redo-btn').disabled = (redoStack.length === 0);
-    try { localStorage.setItem('bday_v_sweet_final', JSON.stringify(counts)); } catch(e) {}
+    html+="</tr>";
   }
 
-  /* ─── トースト ─── */
-  function showToast(m, d) {
-    var toast = document.getElementById('toast-notice');
-    toast.innerText = (m + 1) + '月' + (d + 1) + '日がえらばれたよ！';
-    toast.style.display = 'none';
-    void toast.offsetWidth;
-    toast.style.display = 'block';
-    if (window.navigator && window.navigator.vibrate) {
-      window.navigator.vibrate([20, 10, 40]);
-    }
-  }
+  table.innerHTML=html;
 
-  /* ─── ハイライト ─── */
-  window.toggleRow = function(m) { activeMonth = (activeMonth === m) ? null : m; render(); };
-  window.toggleCol = function(d) { activeDay   = (activeDay   === d) ? null : d; render(); };
-
-  /* ─── セルクリック ─── */
-  window.cellClick = function(m, d, fromRandom) {
-    undoStack.push({ type: 'normal', data: JSON.stringify(counts) });
-    if (undoStack.length > 200) undoStack.shift();
-    redoStack = [];
-    counts[m][d]++;
-    if (fromRandom) showToast(m, d);
-    render();
-  };
-
-  /* ─── Undo ─── */
-  window.undo = function() {
-    if (!undoStack.length) return false;
-    var last = undoStack.pop();
-    if (last.type !== 'reset') {
-      redoStack.push({ type: 'normal', data: JSON.stringify(counts) });
-    } else { redoStack = []; }
-    counts = JSON.parse(last.data);
-    render();
-    return true;
-  };
-
-  /* ─── Redo ─── */
-  window.redo = function() {
-    if (!redoStack.length) return false;
-    var next = redoStack.pop();
-    undoStack.push({ type: 'normal', data: JSON.stringify(counts) });
-    counts = JSON.parse(next.data);
-    render();
-    return true;
-  };
-
-  /* ─── 長押しで連続実行 ─── */
-  function setupHold(id, actionFunc) {
-    var btn = document.getElementById(id);
-    function startHold(e) {
-      e.preventDefault();
-      if (!actionFunc()) return;
-      btn.classList.add('holding');
-      holdTimer = setInterval(function() {
-        if (!actionFunc()) stopHold();
-      }, 120);
-    }
-    function stopHold() {
-      clearInterval(holdTimer);
-      holdTimer = null;
-      btn.classList.remove('holding');
-    }
-    btn.addEventListener('mousedown',   startHold);
-    btn.addEventListener('touchstart',  startHold, { passive: false });
-    btn.addEventListener('mouseup',     stopHold);
-    btn.addEventListener('mouseleave',  stopHold);
-    btn.addEventListener('touchend',    stopHold);
-    btn.addEventListener('touchcancel', stopHold);
-    btn.addEventListener('click', function(e) { e.stopPropagation(); });
-  }
-
-  /* ─── 被らないランダム ─── */
-  document.getElementById('btn-no-dup').onclick = function() {
-    var targets = [];
-    for (var m = 0; m < 12; m++)
-      for (var d = 0; d < 31; d++)
-        if (counts[m][d] === 0) targets.push({m:m, d:d});
-    if (!targets.length) {
-      showModal('ぜんぶのマスが埋まったよ！<br>おめでとう〜！',
-        [{label: 'やったー！', action: closeModal, css: 'ctrl-btn'}]);
-      return;
-    }
-    var t = targets[Math.floor(Math.random() * targets.length)];
-    cellClick(t.m, t.d, true);
-  };
-
-  /* ─── 被れるランダム ─── */
-  document.getElementById('btn-allow-dup').onclick = function() {
-    var allValid = [];
-    for (var m = 0; m < 12; m++)
-      for (var d = 0; d < 31; d++)
-        if (counts[m][d] !== -1) allValid.push({m:m, d:d});
-    var t = allValid[Math.floor(Math.random() * allValid.length)];
-    cellClick(t.m, t.d, true);
-  };
-
-  /* ─── リセット ─── */
-  document.getElementById('reset-trigger').onclick = function() {
-    showModal('ぜんぶ消しちゃう？<br>もどすボタンで戻せるよ！', [
-      {label: 'やめる',       action: closeModal,   css: 'ctrl-btn'},
-      {label: '消しちゃう！', action: executeReset, css: 'reset-btn'}
-    ]);
-  };
-
-  function executeReset() {
-    undoStack.push({ type: 'reset', data: JSON.stringify(counts) });
-    redoStack = [];
-    for (var m = 0; m < 12; m++)
-      for (var d = 0; d < 31; d++)
-        if (counts[m][d] > 0) counts[m][d] = 0;
-    render();
-    closeModal();
-  }
-
-  /* ─── モーダル ─── */
-  function showModal(text, buttons) {
-    document.getElementById('modal-text').innerHTML = text;
-    var btnArea = document.getElementById('modal-btns');
-    btnArea.innerHTML = '';
-    buttons.forEach(function(b) {
-      var btn = document.createElement('button');
-      btn.innerText = b.label;
-      btn.className = 'ctrl-btn ' + (b.css || '');
-      btn.onclick = b.action;
-      btnArea.appendChild(btn);
+  // --- セルクリックイベント登録（iOS安定版） ---
+  var cells=table.querySelectorAll(".cell:not(.none)");
+  cells.forEach(function(cell){
+    cell.addEventListener("click",function(){
+      var m=parseInt(this.dataset.m);
+      var d=parseInt(this.dataset.d);
+      cellClick(m,d);
     });
-    document.getElementById('modal-overlay').style.display = 'flex';
-  }
-
-  function closeModal() {
-    document.getElementById('modal-overlay').style.display = 'none';
-  }
-
-  /* ─── バックグラウンド復帰時データ再同期 ─── */
-  document.addEventListener('visibilitychange', function() {
-    if (document.visibilityState === 'visible') {
-      try {
-        var saved = localStorage.getItem('bday_v_sweet_final');
-        if (saved) counts = JSON.parse(saved);
-        render();
-      } catch(e) {}
-    }
   });
 
-  window.onload = init;
+  // --- iOS強制リペイント ---
+  void table.offsetHeight;
+}
+
+function cellClick(m,d){
+  undoStack.push(JSON.stringify(counts));
+  counts[m][d]++;
+  render();
+}
+
+window.onload=init;
 </script>
+
 </body>
 </html>
