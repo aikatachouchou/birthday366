@@ -538,7 +538,7 @@
 
   /* ─── リセット ─── */
   document.getElementById('reset-trigger').onclick = function() {
-    showModal('データをぜんぶ消しちゃう？<br>最初からやりなおす？', [
+    showModal('ぜんぶ消しちゃう？<br>もどすボタンで戻せるよ！', [
       {label: 'やめる',       action: closeModal,   css: 'ctrl-btn'},
       {label: '消しちゃう！', action: executeReset, css: 'reset-btn'}
     ]);
