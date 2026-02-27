@@ -47,47 +47,69 @@
     flex-direction: column;
     align-items: center;
     padding:
-      calc(var(--safe-top) + 20px)
-      calc(var(--safe-right) + 10px)
+      calc(var(--safe-top) + 16px)
+      calc(var(--safe-right) + 12px)
       calc(var(--safe-bottom) + 30px)
-      calc(var(--safe-left) + 10px);
+      calc(var(--safe-left) + 12px);
     color: var(--text-color);
     min-height: 100vh;
     min-height: -webkit-fill-available;
+    gap: 14px;
   }
 
-  /* ━━━ タイトル ━━━ */
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     【修正2】ヘッダー構造
+     タイトルと操作ボタンを同一コンテナに入れ
+     絶対配置による重なりを解消
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  .header {
+    width: 100%;
+    max-width: 900px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* タイトルはグリッド中央列 */
   h1 {
+    grid-column: 2;
     color: var(--sub-pink);
-    font-size: clamp(1.8rem, 6vw, 3rem);
-    margin: 0 0 16px;
+    font-size: clamp(1.6rem, 4vw, 3rem);
+    margin: 0;
     text-shadow: 3px 3px 0 white, -1px -1px 0 white;
     letter-spacing: 2px;
     text-align: center;
+    white-space: nowrap;
   }
 
-  /* ━━━ 操作パネル ━━━ */
+  /* 操作ボタンはグリッド右列 */
   .controls {
+    grid-column: 3;
     display: flex;
-    gap: 10px;
-    justify-content: center;
+    gap: 8px;
+    justify-content: flex-end;
     flex-wrap: wrap;
-    margin-bottom: 16px;
   }
 
-  /* PC のみ右上固定 */
-  @media (min-width: 700px) {
+  /* スマホはヘッダーを縦積みに変更 */
+  @media (max-width: 600px) {
+    .header {
+      grid-template-columns: 1fr;
+    }
+    h1 {
+      grid-column: 1;
+      font-size: clamp(1.5rem, 6vw, 2.4rem);
+    }
     .controls {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      margin-bottom: 0;
+      grid-column: 1;
+      justify-content: center;
     }
   }
 
   .ctrl-btn {
-    padding: 10px 18px;
-    font-size: 14px;
+    padding: 10px 16px;
+    font-size: 13px;
     font-weight: bold;
     border: 2px solid #ffecb3;
     border-radius: 15px;
@@ -99,6 +121,7 @@
     transition: all 0.1s;
     touch-action: manipulation;
     min-height: 44px;
+    white-space: nowrap;
   }
   .ctrl-btn:active  { transform: translateY(3px); box-shadow: 0 1px 0 #ffecb3; }
   .ctrl-btn:hover   { opacity: 0.85; }
@@ -115,7 +138,6 @@
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    margin-bottom: 24px;
   }
   .table-wrapper::-webkit-scrollbar { height: 4px; }
   .table-wrapper::-webkit-scrollbar-thumb { background: #ffcada; border-radius: 4px; }
@@ -128,6 +150,11 @@
     box-shadow: 0 15px 30px rgba(255, 183, 197, 0.2);
     display: inline-block;
     min-width: max-content;
+    /* 【修正1】GPU合成レイヤーに乗せることでiOS Safariの
+       innerHTML再描画後のリペイント遅延を防ぐ */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: contents;
   }
 
   table { border-collapse: separate; border-spacing: 4px; }
@@ -138,14 +165,14 @@
     cursor: pointer;
     background-color: #fffdf9;
     border-radius: 12px;
-    transition: all 0.2s;
+    transition: background-color 0.15s;
     border: 2px solid #fff5f7;
     font-family: inherit;
     color: var(--text-color);
     touch-action: manipulation;
   }
-  th:hover        { background-color: var(--highlight-bg); }
-  th:active       { transform: scale(0.9); }
+  th:hover  { background-color: var(--highlight-bg); }
+  th:active { transform: scale(0.9); }
   th.active-header {
     background-color: var(--main-pink) !important;
     color: white !important;
@@ -161,12 +188,13 @@
     font-size: 16px;
     font-weight: bold;
     font-family: inherit;
-    transition: all 0.12s;
+    /* transitionをtransformのみに限定（backgroundはすぐ反映） */
+    transition: transform 0.12s;
     background: white;
     touch-action: manipulation;
     color: var(--text-color);
   }
-  .cell:hover  { transform: scale(1.15) rotate(2deg); z-index: 10; border-color: var(--main-pink); }
+  .cell:hover  { transform: scale(1.15) rotate(2deg); border-color: var(--main-pink); }
   .cell:active { transform: scale(0.85) rotate(2deg); }
 
   .highlight-row { background-color: var(--highlight-bg) !important; }
@@ -180,7 +208,11 @@
   .color-4 { background-color: #ffe0b2 !important; }
   .color-5 { background-color: #f8bbd0 !important; border-color: var(--sub-pink) !important; }
 
-  /* ━━━ ランダムボタン ━━━ */
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     【修正3】ランダムボタン
+     white-space: nowrap で強制改行を防止
+     flex-shrink: 0 で縮小させない
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   .btn-area {
     display: flex;
     gap: 16px;
@@ -191,11 +223,9 @@
   }
 
   .main-btn {
-    flex: 1;
-    min-width: 140px;
-    max-width: 220px;
-    padding: 18px 30px;
-    font-size: clamp(1rem, 3vw, 1.3rem);
+    flex: 0 0 auto;           /* 縮小・拡大しない */
+    padding: 18px 32px;
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
     font-weight: bold;
     cursor: pointer;
     color: white;
@@ -205,8 +235,9 @@
     transition: all 0.2s;
     touch-action: manipulation;
     min-height: 56px;
+    white-space: nowrap;      /* テキストを折り返さない */
   }
-  .btn-no-dup   { background-color: var(--sub-pink); box-shadow: 0 8px 0 #e57399; }
+  .btn-no-dup    { background-color: var(--sub-pink); box-shadow: 0 8px 0 #e57399; }
   .btn-allow-dup { background-color: var(--mint-green); color: #5d4037; box-shadow: 0 8px 0 #8cc7b1; }
   .main-btn:hover  { opacity: 0.9; }
   .main-btn:active { transform: translateY(6px); box-shadow: 0 2px 0 rgba(0,0,0,0.1); }
@@ -215,7 +246,8 @@
   #toast-notice {
     position: fixed;
     bottom: calc(var(--safe-bottom) + 50px);
-    left: 50%; transform: translateX(-50%);
+    left: 50%;
+    transform: translateX(-50%);
     background: linear-gradient(to right, var(--sub-pink), #ffb7c5);
     color: white;
     padding: 15px 35px;
@@ -278,23 +310,21 @@
     z-index: 1000;
     font-family: inherit;
   }
-  .credit a {
-    color: var(--sub-pink);
-    text-decoration: none;
-    transition: opacity 0.2s;
-  }
-  .credit a:hover { text-decoration: underline; opacity: 1; }
+  .credit a { color: var(--sub-pink); text-decoration: none; }
+  .credit a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 
-  <div class="controls">
-    <button id="undo-btn" class="ctrl-btn">← もどす</button>
-    <button id="redo-btn" class="ctrl-btn">すすむ →</button>
-    <button id="reset-trigger" class="ctrl-btn reset-btn">ぜんぶ消す！</button>
+  <div class="header">
+    <div><!-- 左の空きスペース（グリッドバランス用） --></div>
+    <h1>みんなのお誕生日</h1>
+    <div class="controls">
+      <button id="undo-btn" class="ctrl-btn">← もどす</button>
+      <button id="redo-btn" class="ctrl-btn">すすむ →</button>
+      <button id="reset-trigger" class="ctrl-btn reset-btn">ぜんぶ消す！</button>
+    </div>
   </div>
-
-  <h1>みんなのお誕生日</h1>
 
   <div class="table-wrapper">
     <div class="table-container">
@@ -345,6 +375,19 @@
     }
   }
 
+  /* 【修正1】iOS Safari リペイント強制 */
+  function forceRepaint(el) {
+    // offsetWidth 参照でリフロー・リペイントを強制発火
+    void el.offsetWidth;
+    // さらに requestAnimationFrame で次フレームも確実に更新
+    requestAnimationFrame(function() {
+      el.style.webkitTransform = 'translateZ(0)';
+      requestAnimationFrame(function() {
+        el.style.webkitTransform = '';
+      });
+    });
+  }
+
   function render() {
     var table = document.getElementById('calendar-table');
     var html = '<tr><th></th>';
@@ -367,13 +410,18 @@
           if (activeMonth === m) cls += ' highlight-row';
           if (activeDay === d)   cls += ' highlight-col';
           if (activeMonth === m && activeDay === d) cls += ' cross-point';
-          html += '<td class="' + cls + '" onclick="cellClick(' + m + ',' + d + ')">' + (val > 0 ? val : '') + '</td>';
+          html += '<td class="' + cls + '" onclick="cellClick(' + m + ',' + d + ')">'
+                + (val > 0 ? val : '') + '</td>';
         }
       }
       html += '</tr>';
     }
 
     table.innerHTML = html;
+
+    /* 【修正1】innerHTML 更新後にリペイントを強制発火 */
+    forceRepaint(table);
+
     document.getElementById('undo-btn').disabled = (undoStack.length === 0);
     document.getElementById('redo-btn').disabled = (redoStack.length === 0);
     try { localStorage.setItem('bday_v_sweet_final', JSON.stringify(counts)); } catch(e) {}
@@ -444,7 +492,7 @@
 
   document.getElementById('reset-trigger').onclick = function() {
     showModal('データをぜんぶ消しちゃう？<br>最初からやりなおす？', [
-      {label: 'やめる',      action: closeModal,   css: 'ctrl-btn'},
+      {label: 'やめる',       action: closeModal,   css: 'ctrl-btn'},
       {label: '消しちゃう！', action: executeReset, css: 'reset-btn'}
     ]);
   };
@@ -480,7 +528,6 @@
   document.getElementById('undo-btn').onclick = undo;
   document.getElementById('redo-btn').onclick = redo;
 
-  /* バックグラウンドから復帰時にデータを再同期 */
   document.addEventListener('visibilitychange', function() {
     if (document.visibilityState === 'visible') {
       try {
