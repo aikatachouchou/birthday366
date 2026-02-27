@@ -161,13 +161,24 @@ th.active-header { background: var(--main-pink); color: white; }
 
 /* 1. トーストのCSS修正：改行を禁止 */
 #toast {
-  position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%);
+position: fixed;
+  bottom: 35px;
+  left: 50%;
+  transform: translateX(-50%);
   background: linear-gradient(to right,#ff8fb1,#ffb7c5);
-  color: white; padding: 12px 24px; border-radius: 30px;
-  display: none; z-index: 2000; font-size: 1rem;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  display: none;
+  z-index: 2000;
+  font-size: clamp(0.8rem, 4vw, 1rem); /* 画面に合わせて文字サイズも微調整 */
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  white-space: nowrap; /* 強制改行を防止 */
-}
+
+  /* --- 修正ポイント --- */
+  white-space: nowrap;       /* 絶対に改行させない */
+  width: auto;               /* 幅を中身に合わせる */
+  min-width: fit-content;    /* 中身が収まる最小幅を確保 */
+  max-width: 95vw;           /* 画面からはみ出さないよう、画面幅の95%まで許可 */}
 
 /* トースト用アニメーション */
 .toast-anim {
