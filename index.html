@@ -2,8 +2,9 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>みんなのお誕生日</title>
+<link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&display=swap" rel="stylesheet">
 
 <style>
 :root{
@@ -13,69 +14,124 @@
   --highlight-border:#ffcada;
   --bg-color:#fffaf0;
   --text-color:#7d5a50;
-  --mint-green:#b2e2d2;
-}
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-  user-select:none;
 }
 body{
   margin:0;
-  font-family:sans-serif;
+  font-family:'Kiwi Maru',serif;
   background:var(--bg-color);
   display:flex;
   flex-direction:column;
   align-items:center;
   padding:20px;
-  gap:15px;
+  gap:14px;
+  color:var(--text-color);
 }
 h1{color:var(--sub-pink);margin:0;}
-.controls,.btn-area{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
-button{
+
+.controls,.btn-area{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+
+.ctrl-btn{
   padding:10px 16px;
-  border-radius:12px;
-  border:none;
   font-weight:bold;
+  border-radius:16px;
+  border:2px solid #ffecb3;
+  background:white;
+  box-shadow:0 4px 0 #ffecb3;
   cursor:pointer;
 }
-.reset-btn{background:#ff8a80;color:white;}
-.btn-no-dup{background:var(--sub-pink);color:white;}
-.btn-allow-dup{background:var(--mint-green);}
+.ctrl-btn:active{
+  transform:translateY(3px);
+  box-shadow:0 1px 0 #ffecb3;
+}
+.reset-btn{
+  background:#ff8a80;
+  color:white;
+  border-color:#ff5252;
+  box-shadow:0 4px 0 #ff5252;
+}
+
 .table-container{
   background:white;
   padding:16px;
-  border-radius:25px;
+  border-radius:30px;
   border:6px solid #ffecb3;
 }
-table{border-collapse:separate;border-spacing:4px;}
-th,.cell{
-  width:34px;height:34px;
+
+table{
+  border-collapse:separate;
+  border-spacing:4px;
+}
+
+th{
+  width:38px;              /* ← 固定幅 */
+  height:34px;
   text-align:center;
-  border-radius:8px;
-  font-size:13px;
-}
-th{cursor:pointer;}
-.cell{
-  background:white;
-  border:2px solid #eee;
+  border-radius:10px;
   cursor:pointer;
+  font-size:12px;
+  white-space:nowrap;      /* ← 折り返し防止 */
 }
-.cell.none{background:#f5f5f5;pointer-events:none;}
-.color-1{background:#e1f5fe;}
-.color-2{background:#f1f8e9;}
-.color-3{background:#fff9c4;}
-.color-4{background:#ffe0b2;}
-.color-5{background:#f8bbd0;}
-#toast{
-  position:fixed;
-  bottom:40px;
-  background:var(--sub-pink);
+
+th.active-header{
+  background:var(--main-pink);
   color:white;
-  padding:10px 20px;
-  border-radius:20px;
-  display:none;
 }
+
+td{
+  width:34px;
+  height:34px;
+  text-align:center;
+  border-radius:10px;
+}
+
+.cell{
+  border:2px solid #ffe4ec;
+  cursor:pointer;
+  background:white;
+  font-weight:bold;
+}
+
+.cell.none{
+  background:#f5f5f5;
+  border:none;
+  pointer-events:none;
+  opacity:0.5;
+}
+
+.highlight-row{
+  background:var(--highlight-bg)!important;
+}
+
+.highlight-col{
+  background:var(--highlight-bg)!important;
+}
+
+.cross-point{
+  box-shadow:0 0 0 3px var(--highlight-border);
+}
+
+.color-1{background:#e1f5fe!important;}
+.color-2{background:#f1f8e9!important;}
+.color-3{background:#fff9c4!important;}
+.color-4{background:#ffe0b2!important;}
+.color-5{background:#f8bbd0!important;}
+
+.main-btn{
+  padding:16px 30px;
+  border-radius:50px;
+  border:none;
+  font-weight:bold;
+  cursor:pointer;
+  color:white;
+}
+.btn-no-dup{background:var(--sub-pink);}
+.btn-allow-dup{background:#b2e2d2;color:#5d4037;}
+
 .overlay{
   position:fixed;
   inset:0;
@@ -86,9 +142,52 @@ th{cursor:pointer;}
 }
 .modal{
   background:white;
-  padding:30px;
-  border-radius:20px;
+  padding:40px;
+  border-radius:30px;
+  border:6px solid #ffecb3;
   text-align:center;
+}
+.modal-buttons{
+  margin-top:20px;
+  display:flex;
+  gap:15px;
+  justify-content:center;
+}
+
+.credit{
+  position:fixed;
+  right:20px;
+  bottom:10px;
+  font-size:13px;
+  opacity:0.8;
+}
+.credit a{
+  color:var(--sub-pink);
+  text-decoration:none;
+}
+.credit a:hover{text-decoration:underline;}
+
+#toast{
+  position:fixed;
+  bottom:40px;
+  left:50%;
+  transform:translateX(-50%);
+  background:linear-gradient(to right,#ff8fb1,#ffb7c5);
+  color:white;
+  padding:14px 28px;
+  border-radius:30px;
+  font-size:1.1rem;
+  display:none;
+  pointer-events:none;
+  animation:fade 1.6s ease forwards;
+  box-shadow:0 8px 20px rgba(0,0,0,0.15);
+}
+
+@keyframes fade{
+  0%{opacity:0;transform:translate(-50%,20px);}
+  20%{opacity:1;transform:translate(-50%,0);}
+  80%{opacity:1;}
+  100%{opacity:0;transform:translate(-50%,-20px);}
 }
 </style>
 </head>
@@ -97,9 +196,9 @@ th{cursor:pointer;}
 <h1>みんなのお誕生日</h1>
 
 <div class="controls">
-  <button id="undo-btn">← もどす</button>
-  <button id="redo-btn">すすむ →</button>
-  <button id="reset-trigger" class="reset-btn">ぜんぶ消す！</button>
+  <button id="undo-btn" class="ctrl-btn">← もどす</button>
+  <button id="redo-btn" class="ctrl-btn">すすむ →</button>
+  <button id="reset-btn" class="ctrl-btn reset-btn">ぜんぶ消す！</button>
 </div>
 
 <div class="table-container">
@@ -107,125 +206,191 @@ th{cursor:pointer;}
 </div>
 
 <div class="btn-area">
-  <button id="btn-no-dup" class="btn-no-dup">被らないランダム</button>
-  <button id="btn-allow-dup" class="btn-allow-dup">被れるランダム</button>
+  <button id="btn-no-dup" class="main-btn btn-no-dup">被らないランダム</button>
+  <button id="btn-allow-dup" class="main-btn btn-allow-dup">被れるランダム</button>
 </div>
 
-<div id="toast"></div>
-
-<div id="modal-overlay" class="overlay">
+<div id="modal" class="overlay">
   <div class="modal">
     <p id="modal-text"></p>
-    <div id="modal-buttons"></div>
+    <div class="modal-buttons" id="modal-buttons"></div>
   </div>
 </div>
 
+<div class="credit">
+  <a href="https://x.com/momochou_md?s=20" target="_blank">
+    for @momochou_md
+  </a>
+</div>
+
 <script>
-var monthDays=[31,29,31,30,31,30,31,31,30,31,30,31];
-var counts=[];
-var undoStack=[];
-var redoStack=[];
+const monthDays=[31,29,31,30,31,30,31,31,30,31,30,31];
+let counts=[],undoStack=[],redoStack=[];
+let completedShown=false;
+let activeMonth=null;
+let activeDay=null;
 
 function buildEmpty(){
   counts=[];
-  for(var m=0;m<12;m++){
-    var row=[];
-    for(var d=0;d<31;d++){
+  for(let m=0;m<12;m++){
+    let row=[];
+    for(let d=0;d<31;d++)
       row.push(d<monthDays[m]?0:-1);
-    }
     counts.push(row);
   }
-}
-
-function init(){
-  buildEmpty();
-  render();
+  completedShown=false;
 }
 
 function render(){
-  var table=document.getElementById("calendar-table");
-  var html="<tr><th></th>";
-  for(var d=0;d<31;d++){
-    html+="<th>"+(d+1)+"</th>";
+  const table=document.getElementById("calendar-table");
+  let html="<tr><th></th>";
+  for(let d=0;d<31;d++){
+    let cls=(activeDay===d)?"active-header":"";
+    html+=`<th class="${cls}" data-col="${d}">${d+1}</th>`;
   }
   html+="</tr>";
-  for(var m=0;m<12;m++){
-    html+="<tr><th>"+(m+1)+"月</th>";
-    for(var d=0;d<31;d++){
-      var val=counts[m][d];
-      if(val===-1){
-        html+="<td class='cell none'></td>";
-      }else{
-        var cls="cell";
-        if(val>0)cls+=" color-"+(val>5?5:val);
-        html+="<td class='"+cls+"' data-m='"+m+"' data-d='"+d+"'>"+(val>0?val:"")+"</td>";
+
+  for(let m=0;m<12;m++){
+    let rcls=(activeMonth===m)?"active-header":"";
+    html+=`<tr><th class="${rcls}" data-row="${m}">${m+1}月</th>`;
+    for(let d=0;d<31;d++){
+      let val=counts[m][d];
+      if(val===-1) html+="<td class='cell none'></td>";
+      else{
+        let cls="cell";
+        if(val>0) cls+=" color-"+(val>5?5:val);
+        if(activeMonth===m) cls+=" highlight-row";
+        if(activeDay===d) cls+=" highlight-col";
+        if(activeMonth===m&&activeDay===d) cls+=" cross-point";
+        html+=`<td class="${cls}" data-m="${m}" data-d="${d}">${val||""}</td>`;
       }
     }
     html+="</tr>";
   }
   table.innerHTML=html;
 
-  table.querySelectorAll(".cell:not(.none)").forEach(function(cell){
-    cell.addEventListener("click",function(){
-      var m=parseInt(this.dataset.m);
-      var d=parseInt(this.dataset.d);
+  table.querySelectorAll("[data-m]").forEach(cell=>{
+    cell.onclick=()=>{
       undoStack.push(JSON.stringify(counts));
       redoStack=[];
-      counts[m][d]++;
+      counts[cell.dataset.m][cell.dataset.d]++;
       render();
-    });
+    };
   });
 
-  void table.offsetHeight;
+  table.querySelectorAll("[data-row]").forEach(th=>{
+    th.onclick=()=>{
+      activeMonth=(activeMonth==th.dataset.row)?null:+th.dataset.row;
+      render();
+    };
+  });
+
+  table.querySelectorAll("[data-col]").forEach(th=>{
+    th.onclick=()=>{
+      activeDay=(activeDay==th.dataset.col)?null:+th.dataset.col;
+      render();
+    };
+  });
+
+  checkComplete();
 }
 
-document.getElementById("undo-btn").onclick=function(){
-  if(!undoStack.length)return;
-  redoStack.push(JSON.stringify(counts));
-  counts=JSON.parse(undoStack.pop());
-  render();
-};
+function checkComplete(){
+  let complete=true;
+  for(let m=0;m<12;m++)
+    for(let d=0;d<31;d++)
+      if(counts[m][d]===0) complete=false;
 
-document.getElementById("redo-btn").onclick=function(){
-  if(!redoStack.length)return;
-  undoStack.push(JSON.stringify(counts));
-  counts=JSON.parse(redoStack.pop());
-  render();
-};
-
-document.getElementById("btn-no-dup").onclick=function(){
-  var targets=[];
-  for(var m=0;m<12;m++)
-    for(var d=0;d<31;d++)
-      if(counts[m][d]===0)targets.push({m:m,d:d});
-  if(!targets.length)return alert("全部埋まりました！");
-  var t=targets[Math.floor(Math.random()*targets.length)];
-  undoStack.push(JSON.stringify(counts));
-  counts[t.m][t.d]++;
-  render();
-};
-
-document.getElementById("btn-allow-dup").onclick=function(){
-  var all=[];
-  for(var m=0;m<12;m++)
-    for(var d=0;d<31;d++)
-      if(counts[m][d]!==-1)all.push({m:m,d:d});
-  var t=all[Math.floor(Math.random()*all.length)];
-  undoStack.push(JSON.stringify(counts));
-  counts[t.m][t.d]++;
-  render();
-};
-
-document.getElementById("reset-trigger").onclick=function(){
-  if(confirm("全部消しますか？")){
-    undoStack.push(JSON.stringify(counts));
-    buildEmpty();
-    render();
+  if(complete && !completedShown){
+    completedShown=true;
+    showModal("🎉 おめでとう！<br>すべてのマスが開いたよ！",
+      [{text:"とじる",class:"ctrl-btn",action:closeModal}]
+    );
   }
-};
+  if(!complete) completedShown=false;
+}
 
-window.onload=init;
+function showModal(message,buttons){
+  const modal=document.getElementById("modal");
+  const text=document.getElementById("modal-text");
+  const btnArea=document.getElementById("modal-buttons");
+  text.innerHTML=message;
+  btnArea.innerHTML="";
+  buttons.forEach(b=>{
+    const btn=document.createElement("button");
+    btn.className=b.class;
+    btn.innerText=b.text;
+    btn.onclick=b.action;
+    btnArea.appendChild(btn);
+  });
+  modal.style.display="flex";
+}
+function closeModal(){
+  document.getElementById("modal").style.display="none";
+}
+function showToast(m,d){
+  const toast=document.getElementById("toast");
+  toast.innerText=(m+1)+"月"+(d+1)+"日がえらばれたよ！";
+  toast.style.display="none";
+  void toast.offsetWidth; // 再アニメーション用
+  toast.style.display="block";
+}
+
+function initButtons(){
+  document.getElementById("undo-btn").onclick=()=>{
+    if(!undoStack.length)return;
+    redoStack.push(JSON.stringify(counts));
+    counts=JSON.parse(undoStack.pop());
+    render();
+  };
+  document.getElementById("redo-btn").onclick=()=>{
+    if(!redoStack.length)return;
+    undoStack.push(JSON.stringify(counts));
+    counts=JSON.parse(redoStack.pop());
+    render();
+  };
+  document.getElementById("btn-no-dup").onclick=()=>{
+    let targets=[];
+    for(let m=0;m<12;m++)
+      for(let d=0;d<31;d++)
+        if(counts[m][d]===0) targets.push({m,d});
+    if(!targets.length) return;
+    let t=targets[Math.floor(Math.random()*targets.length)];
+    undoStack.push(JSON.stringify(counts));
+    counts[t.m][t.d]++;
+    render();
+showToast(t.m,t.d);
+  };
+  document.getElementById("btn-allow-dup").onclick=()=>{
+    let all=[];
+    for(let m=0;m<12;m++)
+      for(let d=0;d<31;d++)
+        if(counts[m][d]!==-1) all.push({m,d});
+    let t=all[Math.floor(Math.random()*all.length)];
+    undoStack.push(JSON.stringify(counts));
+    counts[t.m][t.d]++;
+    render();
+showToast(t.m,t.d);
+  };
+  document.getElementById("reset-btn").onclick=()=>{
+    showModal("ぜんぶ消しちゃう？",[
+      {text:"やめる",class:"ctrl-btn",action:closeModal},
+      {text:"消しちゃう！",class:"ctrl-btn reset-btn",action:()=>{
+        undoStack.push(JSON.stringify(counts));
+        redoStack=[];
+        buildEmpty();
+        render();
+        closeModal();
+      }}
+    ]);
+  };
+}
+
+buildEmpty();
+render();
+initButtons();
 </script>
 
+<div id="toast"></div>
 </body>
 </html>
